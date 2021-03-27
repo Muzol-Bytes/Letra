@@ -71,6 +71,12 @@ LRESULT Window::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                         break;
                     case VK_DOWN:
                         {
+                            /* std::cout << editor.buffer.getLineLengthAt(editor.cursor_col) << '\n'; */
+                            if (editor.buffer.getLineLengthAt(editor.cursor_col + 1) <= 1)
+                            {
+                                editor.setCursorPosition(0, editor.cursor_col + 1); 
+                                break;
+                            }
                             if (editor.cursor_col + 1 < editor.buffer.getLineNum())
                             {
                                 if (editor.cursor_row + 2 > editor.buffer.getLineLengthAt(editor.cursor_col + 1) - 1 && editor.buffer.getLineLengthAt(editor.cursor_col + 1) != 1)
@@ -78,11 +84,15 @@ LRESULT Window::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                                 else
                                 editor.moveCursor(0, 1);
                             }
-
                         }
                         break;
                     case VK_UP:
                         {
+                            if (editor.cursor_col > 0 && editor.buffer.getLineLengthAt(editor.cursor_col - 1) <= 1)
+                            {
+                                editor.setCursorPosition(0, editor.cursor_col - 1); 
+                                break;
+                            }
                             if (editor.cursor_col > 0)
                             {
                                 editor.moveCursor(0, -1);
