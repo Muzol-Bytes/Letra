@@ -7,15 +7,15 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 set(CMAKE_BUILD_TYPE Debug)
 
 add_executable(${PROJECT_NAME}
-    src/main.cpp
+    src/graphics/rectangle.cpp
+    src/graphics/drawable.cpp
+    src/graphics/text.cpp
+    src/graphics/renderer.cpp
+    src/editor/buffer.cpp
+    src/editor/editor.cpp
+    src/log/log.cpp
     src/file.cpp
-    src/buffer.cpp
-    src/ui/text.cpp
-    src/editor.cpp
-    src/ui/renderer.cpp
-    src/ui/window.cpp
-    src/util/color.cpp
-    src/util/log.cpp
+    src/window.cpp
     src/main.cpp
     )
 

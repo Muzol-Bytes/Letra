@@ -8,7 +8,9 @@
 #include <string>
 #include <cstdint>
 
-class Text
+#include "drawable.hpp"
+
+class Text : public IDrawable
 {
 public:
     Text(std::wstring text);
@@ -30,11 +32,9 @@ public:
     DWRITE_HIT_TEST_METRICS getCharacterMetricsAt(const float x, const float y);
 
     /// Draw text
-    void draw(ID2D1HwndRenderTarget *render_target);
+    void draw(ID2D1HwndRenderTarget *render_target, ID2D1SolidColorBrush *brush);
 
 private:
-    ID2D1SolidColorBrush *p_color_brush;
-
     IDWriteFactory    *p_Dwrite_factory;
     IDWriteTextFormat *p_Dtext_format;
     IDWriteTextLayout *p_Dtext_layout;

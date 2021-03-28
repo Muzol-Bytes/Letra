@@ -2,8 +2,7 @@
 #define _BASE_WINDOW_HPP_
 
 #include <windows.h>
-#include "../util/log.hpp"
-
+#include "../log/log.hpp"
 
 template <class DERIVED_CLASS> 
 class BaseWindow

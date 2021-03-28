@@ -4,9 +4,10 @@
 #include <cstdint>
 #include <d2d1.h>
 
-#include "../editor.hpp"
-#include "base_window.hpp"
-#include "renderer.hpp"
+#include "editor/editor.hpp"
+#include "window/base_window.hpp"
+#include "graphics/renderer.hpp"
+#include "graphics/rectangle.hpp"
 
 class Window : public BaseWindow<Window>
 {

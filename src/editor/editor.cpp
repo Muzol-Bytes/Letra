@@ -1,7 +1,5 @@
 #include "editor.hpp"
 
-#include "file.hpp"
-
 Editor::Editor()
     : text()
     , buffer()

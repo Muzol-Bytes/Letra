@@ -3,13 +3,15 @@
 
 #include <d2d1.h>
 
-#include "ui/text.hpp"
+#include "../graphics/text.hpp"
 #include "buffer.hpp"
 
 struct Editor
 {
     Editor();
 
+    /// NOTE: call this right after the contructor is called
+    /// Initilize the members independent resources
     void init(ID2D1HwndRenderTarget *render_target);
 
     void updateCursor(D2D1_RECT_F& cursor);

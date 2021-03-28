@@ -6,7 +6,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "ui/window.hpp"
+#include "window.hpp"
 
 const uint16_t SCREEN_WIDTH  = 1080;
 const uint16_t SCREEN_HEIGHT = 720;

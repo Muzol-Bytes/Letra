@@ -1,12 +1,13 @@
 #include "renderer.hpp"
 
-#include "../util/log.hpp"
+#include "../log/log.hpp"
 
 Renderer::Renderer()
 {
-    p_factory       = NULL;
-    render_target = NULL;
-    p_bg_brush      = NULL;
+    p_factory        = NULL;
+    render_target    = NULL;
+    p_bg_brush       = NULL;
+    p_drawable_brush = NULL;
 }
 
 Renderer::~Renderer()
@@ -56,7 +57,14 @@ HRESULT Renderer::createGraphicsResources(HWND hwnd)
         ErrorExit("CreateSolidBrush");
     }
 
+    hr = render_target->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f), &p_drawable_brush);
+
     return hr;
+}
+
+void Renderer::draw(IDrawable *drawable)
+{
+    drawable->draw(render_target, p_drawable_brush);
 }
 
 template <class T> static void SafeRelease(T **ppT)
@@ -68,8 +76,10 @@ template <class T> static void SafeRelease(T **ppT)
     }
 }
 
+
 void Renderer::discardGraphicsResources()
 {
     SafeRelease(&render_target);
     SafeRelease(&p_bg_brush);
+    SafeRelease(&p_drawable_brush);
 }

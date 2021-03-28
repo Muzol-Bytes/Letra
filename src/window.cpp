@@ -1,5 +1,7 @@
 #include "window.hpp"
-#include "../file.hpp"
+#include "file.hpp"
+
+#include "graphics/rectangle.hpp"
 
 #include <iostream>
 
@@ -107,11 +109,15 @@ LRESULT Window::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             switch ((wchar_t)wParam)
             {
-                case 0x08:
+                case 0x08: // Backspace
                     if (editor.cursor_row > 0)
                     {
                         editor.buffer.deleteaAt(editor.cursor_col, --editor.cursor_row, 1);
                     }
+                    break;
+                case 0x09: // Replace tab to space
+                    editor.buffer.insertAt(editor.cursor_col, editor.cursor_row, 4, L' ');
+                    editor.moveCursor(4, 0);
                     break;
                 case 0x0D:
                     {
@@ -123,8 +129,8 @@ LRESULT Window::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                             new_str += temp_str[i];
                         }
                         editor.buffer.deleteaAt(editor.cursor_col, editor.cursor_row, new_str.size() - 1);
-                        editor.setCursorPosition(0, editor.cursor_col + 1);
-                        editor.buffer.append(new_str, editor.cursor_col);
+                        editor.buffer.append(new_str, ++editor.cursor_col);
+                        editor.setCursorPosition(0, editor.cursor_col);
                     }
                     break;
                 case 0x1B:
@@ -132,7 +138,7 @@ LRESULT Window::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 break;
                 default:
                     editor.cursor_row++;
-                    editor.buffer.insertAt(editor.cursor_col, editor.cursor_row - 1, (wchar_t)wParam);
+                    editor.buffer.insertAt(editor.cursor_col, editor.cursor_row - 1, 1, (wchar_t)wParam);
                 /* printf("%d\n", (int)wParam); */
                 break;
             }
@@ -165,7 +171,7 @@ void Window::onPaint()
 
     render.render_target->Clear(D2D1::ColorF(0x15 / 255.0f, 0x15 / 255.0f, 0x15 / 255.0f));
     render.render_target->DrawRectangle(cursor, p_brush);
-    editor.text.draw(render.render_target);
+    render.draw(&editor.text);
 
     hr = render.render_target->EndDraw();
 

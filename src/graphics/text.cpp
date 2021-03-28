@@ -1,5 +1,5 @@
 #include "text.hpp"
-#include "../util/log.hpp"
+#include "../log/log.hpp"
 
 #include <cstdio>
 
@@ -14,20 +14,20 @@ template <class T> static void SafeRelease(T **ppT)
 
 Text::Text()
 {
-    m_screen_size = { 0 };
+    m_screen_size    = { 0 };
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
-    p_color_brush    = NULL;
     m_text           = L"";
+    m_color          = 0xff3333;
 }
 
 Text::Text(std::wstring text)
 {
-    m_screen_size = { 0 };
+    m_screen_size    = { 0 };
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
-    p_color_brush    = NULL;
     m_text           = text;
+    m_color          = 0xffffff;
 }
 
 Text::~Text()
@@ -35,7 +35,6 @@ Text::~Text()
     SafeRelease(&p_Dwrite_factory);
     SafeRelease(&p_Dtext_format);
     SafeRelease(&p_Dtext_layout);
-    SafeRelease(&p_color_brush);
 }
 
 HRESULT Text::createDeviceIndependentResources(ID2D1HwndRenderTarget *render_target)
@@ -78,15 +77,6 @@ HRESULT Text::createDeviceIndependentResources(ID2D1HwndRenderTarget *render_tar
             m_screen_size.right,
             m_screen_size.bottom,
             &p_Dtext_layout);
-    }
-
-    if (SUCCEEDED(hr))
-    {
-        hr = render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &p_color_brush); 
-        if (hr != S_OK)
-        {
-            ErrorExit("CreateSolidColorBrush");
-        }
     }
 
     return hr;
@@ -154,7 +144,11 @@ DWRITE_HIT_TEST_METRICS Text::getCharacterMetricsAt(const float x, const float y
     return htm;
 }
 
-void Text::draw(ID2D1HwndRenderTarget *render_target)
+void Text::draw(ID2D1HwndRenderTarget *render_target, ID2D1SolidColorBrush *brush)
 {
-    render_target->DrawTextLayout(D2D1_POINT_2F{0.0f, 0.0f}, p_Dtext_layout, p_color_brush);
+    brush->SetColor(D2D1::ColorF(
+                (m_color >> 16 & 0xff) / 255.0f,
+                (m_color >> 8  & 0xff) / 255.0f,
+                (m_color       & 0xff) / 255.0f)); 
+    render_target->DrawTextLayout(D2D1_POINT_2F{0.0f, 0.0f}, p_Dtext_layout, brush);
 }
