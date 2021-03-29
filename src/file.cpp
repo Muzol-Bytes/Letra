@@ -1,28 +1,36 @@
 #include "file.hpp"
 
-#include <iostream>
 #include <fstream>
-#include <sstream>
 
-std::vector<std::wstring> readFile(const std::wstring& filename)
+File::File(const std::wstring& filename)
+    : m_filename(filename)
+{
+}
+
+std::vector<std::wstring> File::read()
 {
     std::vector<std::wstring> content;
-    std::wifstream file(filename);
+    std::wifstream file(m_filename);
 
-    std::wstring line;
-    while (std::getline(file, line))
-        content.emplace_back(line + L"\n");
+    if (file.is_open())
+    {
+        std::wstring line;
+        while (std::getline(file, line))
+            content.emplace_back(line + L"\n");
+        file.close();
+    }
 
     return content;
 }
 
-#if 0
-int main()
+
+void File::write(const std::wstring& content)
 {
-    std::vector<std::wstring> content = readFile(L"src/main.cpp");
-    for (std::wstring& line : content)
+    std::wofstream file(m_filename);
+
+    if (file.is_open())
     {
-        std::wcout << line;
+        file << content;
+        file.close();
     }
 }
-#endif

@@ -1,5 +1,4 @@
 #include "window.hpp"
-#include "file.hpp"
 
 #include "graphics/rectangle.hpp"
 
@@ -18,13 +17,13 @@ template <class T> static void SafeRelease(T **ppT)
 
 Window::Window (const std::wstring &filename)
     : render()
+    , m_file(filename)
     , editor()
     , p_brush(NULL)
 {
     cursor  = D2D1::RectF(0.0f, 0.0f, 10.0f, 25.0f);
 
-    std::vector<std::wstring> content = readFile(filename);
-    editor.buffer.setBuffer(content);
+    editor.buffer.setBuffer(m_file.read());
 }
 
 void Window::init()
@@ -136,14 +135,16 @@ LRESULT Window::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 case 0x1B:
                     DestroyWindow(m_hwnd);
                 break;
+                case 0x13:
+                    m_file.write(editor.buffer.getContent()); 
+                break;
                 default:
                     editor.cursor_row++;
                     editor.buffer.insertAt(editor.cursor_col, editor.cursor_row - 1, 1, (wchar_t)wParam);
-                /* printf("%d\n", (int)wParam); */
+                    /* printf("%d\n", (int)wParam); */
                 break;
             }
-
-                    editor.text.setString(editor.buffer.getContent());
+                editor.text.setString(editor.buffer.getContent());
         }
             return 0;
         case WM_DESTROY:

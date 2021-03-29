@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <d2d1.h>
 
+#include "file.hpp"
 #include "editor/editor.hpp"
 #include "window/base_window.hpp"
 #include "graphics/renderer.hpp"
@@ -26,6 +27,7 @@ public:
 
 private:
     Editor editor;
+    File m_file;
 
     Renderer render;
     ID2D1SolidColorBrush *p_brush;

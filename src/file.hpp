@@ -4,6 +4,18 @@
 #include <string>
 #include <vector>
 
-std::vector<std::wstring> readFile(const std::wstring& filename);
+class File
+{
+public:
+    File(const std::wstring& filename);
+    
+    std::vector<std::wstring> read();
+
+    void write(const std::wstring& content);
+
+private:
+    std::wstring m_filename;
+};
+
 
 #endif // _FILE_HPP_
