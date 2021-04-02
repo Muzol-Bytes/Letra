@@ -1,9 +1,15 @@
 #include "log.hpp"
 
-void ErrorExit(const char lpszFunction[]) 
+void errorExit(const char lpszFunction[]) 
 { 
-    // Retrieve the system error message for the last-error code
+    DWORD dw = showError(lpszFunction);
 
+    ExitProcess(dw); 
+}
+
+DWORD showError(const char lpszFunction[]) 
+{
+    // Retrieve the system error message for the last-error code
     LPVOID lpMsgBuf;
     LPVOID lpDisplayBuf;
     DWORD dw = GetLastError(); 
@@ -30,5 +36,6 @@ void ErrorExit(const char lpszFunction[])
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
-    ExitProcess(dw); 
+
+    return dw;
 }

@@ -18,7 +18,7 @@ Text::Text()
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
     m_text           = L"";
-    m_color          = 0xff3333;
+    m_color          = 0xffffff;
 }
 
 Text::Text(std::wstring text)
@@ -62,7 +62,7 @@ HRESULT Text::createDeviceIndependentResources(ID2D1HwndRenderTarget *render_tar
     }
     else
     {
-        ErrorExit("CreateTextFormat");
+        errorExit("CreateTextFormat");
     }
 
     if (SUCCEEDED(hr))

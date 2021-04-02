@@ -1,32 +1,25 @@
-#include <cstdio>
-#include <cwchar>
-#include <cstdlib>
-#include <cstdint>
-#include <string>
-#include <cstring>
-#include <iostream>
+#ifndef UNICODE
+#define UNICODE
+#endif
 
-#include "window.hpp"
+#include "application.hpp"
 
 const uint16_t SCREEN_WIDTH  = 1080;
 const uint16_t SCREEN_HEIGHT = 720;
 
-int main(int argc, char* argv[])
+int wmain( int argc, wchar_t *argv[], wchar_t *envp[] )
 {
-    /* std::wstring filename = (const wchar_t*) argv[1]; */
-    std::wstring filename = L"";
-    for (int i = 0; i < strlen(argv[1]); i++)
-    {
-        filename += (wchar_t) argv[1][i];
-    }
+    std::vector<std::wstring> args = { L"" };
 
-    /* std::string filename = (const char*)argv[1]; */
+    if (argc > 1)
+        /// (argc + 1) to skip the first argumnet which is the program filename
+        args = std::vector<std::wstring>(argv + 1, argv + argc);
+    else
+        return 0;
 
-    Window window(filename);
+    Application app(args);
 
-    if (!window.create("Letra", WS_OVERLAPPEDWINDOW))
-        return -1;
+    app.run();
 
-    window.show();
     return 0;
 }

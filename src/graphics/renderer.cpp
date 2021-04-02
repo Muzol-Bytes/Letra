@@ -30,7 +30,7 @@ HRESULT Renderer::createGraphicsResources(HWND hwnd)
     if (FAILED(D2D1CreateFactory(
                     D2D1_FACTORY_TYPE_SINGLE_THREADED, &p_factory)))
     {
-        ErrorExit("D2D1CreateFactory");
+        errorExit("D2D1CreateFactory");
         return S_FALSE;  // Fail to create D2D1Factory.
     }
     
@@ -46,7 +46,7 @@ HRESULT Renderer::createGraphicsResources(HWND hwnd)
 
     if (FAILED(hr) && render_target == NULL)
     {
-        ErrorExit("CreateHwndRenderTarget");
+        errorExit("CreateHwndRenderTarget");
     }
 
     const D2D1::ColorF color = D2D1::ColorF(1.0f, 1.0f, 0.0f);
@@ -54,7 +54,7 @@ HRESULT Renderer::createGraphicsResources(HWND hwnd)
 
     if (FAILED(hr))
     {
-        ErrorExit("CreateSolidBrush");
+        errorExit("CreateSolidBrush");
     }
 
     hr = render_target->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f), &p_drawable_brush);

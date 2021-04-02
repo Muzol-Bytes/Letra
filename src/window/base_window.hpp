@@ -2,7 +2,6 @@
 #define _BASE_WINDOW_HPP_
 
 #include <windows.h>
-#include "../log/log.hpp"
 
 template <class DERIVED_CLASS> 
 class BaseWindow
@@ -43,10 +42,10 @@ public:
             LPCSTR title,
             DWORD dwStyle,
             DWORD dwExStyle = 0,
-            int x = CW_USEDEFAULT,
-            int y = CW_USEDEFAULT,
             int width = CW_USEDEFAULT,
             int height = CW_USEDEFAULT,
+            int x = CW_USEDEFAULT,
+            int y = CW_USEDEFAULT,
             HWND hWndParent = 0,
             HMENU hMenu = 0
             )
@@ -80,6 +79,5 @@ protected:
 
     HWND m_hwnd;
 };
-
 
 #endif // _BASE_WINDOW_HPP_
