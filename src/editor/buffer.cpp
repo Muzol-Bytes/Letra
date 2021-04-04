@@ -5,6 +5,11 @@ Buffer::Buffer()
 {
 }
 
+Buffer::Buffer(const std::vector<std::wstring> content)
+    : m_content(content)
+{
+}
+
 std::wstring Buffer::getContent()
 {
     std::wstring data;

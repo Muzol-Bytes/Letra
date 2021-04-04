@@ -8,7 +8,7 @@
 class Window : public BaseWindow<Window>
 {
 public:
-    Window();
+    Window (LPCSTR title, int width, int height);
 
     LPCSTR  getClassName() const;
 

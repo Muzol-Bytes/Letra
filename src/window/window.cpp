@@ -1,10 +1,13 @@
 #include "window.hpp"
+#include "../log/log.hpp"
 
 #include <string>
 
-Window::Window ()
+Window::Window (LPCSTR title, int width, int height)
+    :BaseWindow()
 {
-
+    if (!create(title, WS_OVERLAPPEDWINDOW, 0, width, height))
+        errorExit("Create Window: ");
 }
 
 LPCSTR Window::getClassName() const

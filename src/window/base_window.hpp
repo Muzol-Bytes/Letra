@@ -6,7 +6,7 @@
 template <class DERIVED_CLASS> 
 class BaseWindow
 {
-public:
+protected:
     BaseWindow()
         : m_hwnd(NULL)
     {
@@ -68,6 +68,7 @@ public:
         return (m_hwnd ? TRUE : FALSE);
     }
 
+public:
     HWND getWindowHandler() const
     { 
         return m_hwnd;

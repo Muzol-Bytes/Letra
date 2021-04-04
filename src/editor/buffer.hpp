@@ -8,6 +8,7 @@ class Buffer
 {
 public:
     Buffer();
+    Buffer(const std::vector<std::wstring> content);
 
     /// Get the entire content of the buffer as a std::wstring
     std::wstring getContent();

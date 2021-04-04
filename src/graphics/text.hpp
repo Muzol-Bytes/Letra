@@ -13,7 +13,7 @@
 class Text : public IDrawable
 {
 public:
-    Text(std::wstring text);
+    Text(std::wstring text, ID2D1HwndRenderTarget *render_target);
 
     Text();
 

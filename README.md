@@ -16,4 +16,7 @@ $ cmake --build .
 $ cd ..
 $ bin\Release\Letra.exe src/main.cpp
 ```
-By now just press `Esc` to leave
+
+### Functionalities
+* `Esc` to leave
+* `Ctrl-S` to save

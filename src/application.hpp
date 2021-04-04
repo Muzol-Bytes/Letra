@@ -3,8 +3,10 @@
 
 #include <vector>
 
-#include "editor/editor.hpp"
+#include "graphics/text.hpp"
+#include "editor/buffer.hpp"
 #include "file.hpp"
+#include "editor/cursor.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/rectangle.hpp"
 #include "window/window.hpp"
@@ -25,13 +27,14 @@ public:
     void onPaint();
 
 private:
-    Window window;
-    Editor editor;
-    File m_file;
+    Window   window;
     Renderer render;
+    File     m_file;
+    Buffer   m_buffer;
+    Text     m_text;
+    Cursor   m_cursor;
 
     ID2D1SolidColorBrush *p_brush;
-    D2D1_RECT_F cursor;
 };
 
 #endif // _APPLICATION_HPP_

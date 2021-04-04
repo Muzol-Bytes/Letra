@@ -9,7 +9,7 @@ const uint16_t SCREEN_HEIGHT = 720;
 
 int wmain( int argc, wchar_t *argv[], wchar_t *envp[] )
 {
-    std::vector<std::wstring> args = { L"" };
+    std::vector<std::wstring> args = { L"src/main.cpp" };
 
     if (argc > 1)
         /// (argc + 1) to skip the first argumnet which is the program filename

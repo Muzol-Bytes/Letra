@@ -2,12 +2,14 @@
 
 #include "../log/log.hpp"
 
-Renderer::Renderer()
+Renderer::Renderer(HWND hwnd)
 {
     p_factory        = NULL;
     render_target    = NULL;
     p_bg_brush       = NULL;
     p_drawable_brush = NULL;
+
+    createGraphicsResources(hwnd);
 }
 
 Renderer::~Renderer()

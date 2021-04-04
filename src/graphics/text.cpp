@@ -21,13 +21,15 @@ Text::Text()
     m_color          = 0xffffff;
 }
 
-Text::Text(std::wstring text)
+Text::Text(std::wstring text, ID2D1HwndRenderTarget *render_target)
 {
     m_screen_size    = { 0 };
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
     m_text           = text;
     m_color          = 0xffffff;
+
+    createDeviceIndependentResources(render_target);
 }
 
 Text::~Text()
