@@ -13,23 +13,27 @@
 class Text : public IDrawable
 {
 public:
-    Text(std::wstring text, ID2D1HwndRenderTarget *render_target);
-
     Text();
+
+    Text(std::wstring text, ID2D1HwndRenderTarget *render_target);
 
     ~Text();
 
     /// Initialize the text core resources and create a renderable text object
     HRESULT createDeviceIndependentResources(ID2D1HwndRenderTarget *render_target);
 
-    /// NOTE: Only call this function after you call "createDeviceIndependentResources"
-    void setString(const std::wstring& str);
-
     /// Get a character metrics at a certain position (use it like get a value from an array)
     DWRITE_HIT_TEST_METRICS getCharacterMetricsAt(UINT32 char_pos);
 
     /// Get a character metrics at x and y device independent pixels 
     DWRITE_HIT_TEST_METRICS getCharacterMetricsAt(const float x, const float y);
+
+    void setPosition(const float x, const float y);
+
+    D2D1_POINT_2F getPosition() const;
+
+    /// NOTE: Only call this function after you call "createDeviceIndependentResources"
+    void setString(const std::wstring& str);
 
     /// Draw text
     void draw(ID2D1HwndRenderTarget *render_target, ID2D1SolidColorBrush *brush);
@@ -41,6 +45,7 @@ private:
     RECT m_screen_size;
 
     std::wstring m_text;
+    D2D1_POINT_2F m_pos;
 };
 
 #endif // _TEXT_HPP_

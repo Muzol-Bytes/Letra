@@ -64,6 +64,11 @@ HRESULT Renderer::createGraphicsResources(HWND hwnd)
     return hr;
 }
 
+D2D1_SIZE_F Renderer::getSize() const
+{
+    return render_target->GetSize();
+}
+
 void Renderer::draw(IDrawable *drawable)
 {
     drawable->draw(render_target, p_drawable_brush);

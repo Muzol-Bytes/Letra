@@ -2,11 +2,21 @@
 
 Rect::Rect(float width, float height)
 {
-    m_color       = 0xff0000;
+    m_color       = 0x3333ff;
     m_body.left   = 0.0f;
     m_body.right  = width;
     m_body.top    = 0.0f;
     m_body.bottom = height;
+}
+
+float Rect::getHeight() const
+{
+    return m_body.bottom - m_body.top;
+}
+
+float Rect::getWidth() const
+{
+    return m_body.right - m_body.left;
 }
 
 void Rect::setPosition(const float x, const float y)
@@ -21,8 +31,8 @@ void Rect::setPosition(const float x, const float y)
 
 void Rect::setSize(const float width, const float height)
 {
-    m_body.right  = width;
-    m_body.bottom = height;
+    m_body.right  = m_body.left + width;
+    m_body.bottom = m_body.top + height;
 }
 
 void Rect::setColor(const uint32_t color)

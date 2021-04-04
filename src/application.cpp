@@ -2,6 +2,8 @@
 
 #include "log/log.hpp"
 
+#include <iostream>
+
 const static uint16_t SCREEN_WIDTH  = 1080;
 const static uint16_t SCREEN_HEIGHT = 720;
 
@@ -12,9 +14,17 @@ Application::Application(const std::vector<std::wstring> argv)
     , m_buffer(m_file.read())
     , m_text(m_buffer.getContent(), render.render_target)
     , m_cursor(m_text.getCharacterMetricsAt(1, 1))
+    , m_command_prompt(0.0f, 0.0f, render.render_target)
     , p_brush(NULL)
 {
     render.render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &p_brush);
+    m_command_prompt.setWidth(SCREEN_WIDTH);
+    
+    /// CommandPrompt config
+    D2D1_SIZE_F size = render.getSize();
+    float char_size = m_text.getCharacterMetricsAt(1, 1).height;
+    m_command_prompt.setPosition(0.0f, size.height - char_size);
+    /// ---------------------------------------------------------
 }
 
 template <class T> static void SafeRelease(T **ppT)
@@ -54,6 +64,11 @@ void Application::update()
 
 void Application::handleInput(const MSG& msg)
 {
+    if (m_command_prompt.getInput())
+    {
+        m_command_prompt.handleInput(msg.wParam);
+    }
+
     /// NOTE: lParam and msg.wParam are inside the msg struct
     switch (msg.message)
     {
@@ -121,6 +136,7 @@ void Application::handleInput(const MSG& msg)
                 break;
                 case 0x13: // Ctrl-S
                     m_file.write(m_buffer.getContent()); 
+                    m_command_prompt.setString(L"File Saved!");
                 break;
                 default:
                 {
@@ -161,6 +177,7 @@ void Application::onPaint()
     render.render_target->Clear(D2D1::ColorF(0x15 / 255.0f, 0x15 / 255.0f, 0x15 / 255.0f));
     m_cursor.draw(render);
     render.draw(&m_text);
+    m_command_prompt.draw(render);
 
     hr = render.render_target->EndDraw();
 

@@ -10,6 +10,10 @@ class Rect : public IDrawable
 public:
     Rect(float width, float height);
 
+    float getHeight() const;
+
+    float getWidth() const;
+
     void setPosition(const float x, const float y);
 
     void setSize(const float width, const float height);

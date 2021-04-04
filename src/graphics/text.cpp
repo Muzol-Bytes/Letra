@@ -18,6 +18,7 @@ Text::Text()
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
     m_text           = L"";
+    m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
 }
 
@@ -27,6 +28,7 @@ Text::Text(std::wstring text, ID2D1HwndRenderTarget *render_target)
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
     m_text           = text;
+    m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
 
     createDeviceIndependentResources(render_target);
@@ -84,28 +86,6 @@ HRESULT Text::createDeviceIndependentResources(ID2D1HwndRenderTarget *render_tar
     return hr;
 }
 
-void Text::setString(const std::wstring& str)
-{
-
-    HRESULT hr = S_OK;
-    IDWriteTextLayout *temp_layout = NULL;
-
-    hr = p_Dwrite_factory->CreateTextLayout(
-        str.c_str(),
-        str.size(),
-        p_Dtext_format,
-        m_screen_size.right,
-        m_screen_size.bottom,
-        &temp_layout);
-
-    if (SUCCEEDED(hr))
-    {
-        SafeRelease(&p_Dtext_layout);
-        p_Dtext_layout = temp_layout;
-        m_text = str;
-    }
-}
-
 DWRITE_HIT_TEST_METRICS Text::getCharacterMetricsAt(UINT32 char_pos)
 {
     DWRITE_HIT_TEST_METRICS htm;
@@ -146,11 +126,43 @@ DWRITE_HIT_TEST_METRICS Text::getCharacterMetricsAt(const float x, const float y
     return htm;
 }
 
+void Text::setPosition(const float x, const float y)
+{
+    m_pos = (D2D1_POINT_2F){ x, y };
+}
+
+D2D1_POINT_2F Text::getPosition() const
+{
+    return m_pos;
+}
+
+void Text::setString(const std::wstring& str)
+{
+
+    HRESULT hr = S_OK;
+    IDWriteTextLayout *temp_layout = NULL;
+
+    hr = p_Dwrite_factory->CreateTextLayout(
+        str.c_str(),
+        str.size(),
+        p_Dtext_format,
+        m_screen_size.right,
+        m_screen_size.bottom,
+        &temp_layout);
+
+    if (SUCCEEDED(hr))
+    {
+        SafeRelease(&p_Dtext_layout);
+        p_Dtext_layout = temp_layout;
+        m_text = str;
+    }
+}
+
 void Text::draw(ID2D1HwndRenderTarget *render_target, ID2D1SolidColorBrush *brush)
 {
     brush->SetColor(D2D1::ColorF(
                 (m_color >> 16 & 0xff) / 255.0f,
                 (m_color >> 8  & 0xff) / 255.0f,
                 (m_color       & 0xff) / 255.0f)); 
-    render_target->DrawTextLayout(D2D1_POINT_2F{0.0f, 0.0f}, p_Dtext_layout, brush);
+    render_target->DrawTextLayout(m_pos, p_Dtext_layout, brush);
 }

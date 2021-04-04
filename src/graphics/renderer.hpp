@@ -15,9 +15,11 @@ public:
 
     HRESULT createGraphicsResources(HWND hwnd);
 
-    ID2D1HwndRenderTarget *render_target;
+    D2D1_SIZE_F getSize() const;
 
     void draw(IDrawable *drawable);
+
+    ID2D1HwndRenderTarget *render_target;
     
 private:
     void discardGraphicsResources();

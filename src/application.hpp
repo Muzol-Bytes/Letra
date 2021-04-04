@@ -5,6 +5,7 @@
 
 #include "graphics/text.hpp"
 #include "editor/buffer.hpp"
+#include "editor/command_prompt.hpp"
 #include "file.hpp"
 #include "editor/cursor.hpp"
 #include "graphics/renderer.hpp"
@@ -33,6 +34,7 @@ private:
     Buffer   m_buffer;
     Text     m_text;
     Cursor   m_cursor;
+    CommandPrompt m_command_prompt;
 
     ID2D1SolidColorBrush *p_brush;
 };
