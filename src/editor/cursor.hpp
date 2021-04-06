@@ -26,11 +26,14 @@ public:
     
     float getCol() const;
 
+    void setPosition(const float row, const float col);
+
+    void setColor(const uint32_t color);
+
     void move(const float row_offset, const float col_offset);
 
     void move(const WPARAM wParam, Buffer& buffer);
 
-    void setPosition(const float row, const float col);
 
     void draw(Renderer& render);
 

@@ -11,7 +11,7 @@ Cursor::Cursor(const  DWRITE_HIT_TEST_METRICS htm)
    m_height = htm.height;
 
    m_body.setSize(m_width, m_height);
-   m_body.setColor(0xffffff);
+   m_body.setColor(0xfe8019);
 }
 
 Rect Cursor::getBody() const
@@ -27,6 +27,19 @@ float Cursor::getRow() const
 float Cursor::getCol() const
 {
     return m_col;
+}
+
+void Cursor::setPosition(const float row, const float col)
+{
+    m_row = row;
+    m_col = col;
+
+    m_body.setPosition(m_row * m_width, m_col * m_height);
+}
+
+void Cursor::setColor(const uint32_t color)
+{
+    m_body.setColor(color);
 }
 
 void Cursor::move(const float row_offset, const float col_offset)
@@ -94,14 +107,6 @@ void Cursor::move(const WPARAM wParam, Buffer& buffer)
         }
         break;
     };
-
-    m_body.setPosition(m_row * m_width, m_col * m_height);
-}
-
-void Cursor::setPosition(const float row, const float col)
-{
-    m_row = row;
-    m_col = col;
 
     m_body.setPosition(m_row * m_width, m_col * m_height);
 }

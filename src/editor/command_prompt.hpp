@@ -16,9 +16,19 @@
 class CommandPrompt
 {
 public:
+    enum Type
+    {
+        NONE,
+        OPEN_FILE,
+        GOTO_LINE,
+        SAVE_FILE_AS,
+    };
+
     CommandPrompt(const float x, const float y, ID2D1HwndRenderTarget *render_target);
 
     std::wstring getContent();
+
+    CommandPrompt::Type getCmdType() const;
 
     bool getInput() const;
 
@@ -26,7 +36,7 @@ public:
 
     void setColor(const uint32_t color);
 
-    void setInput(const bool inpt);
+    void setInput(const bool inpt, const CommandPrompt::Type cmd_type);
 
     void setString(const std::wstring& str);
 
@@ -41,6 +51,7 @@ public:
 private:
     Text m_text;
     Rect m_body;
+    Type m_cmd_type;
 
     std::wstring m_buffer;
     bool m_input;

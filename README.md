@@ -20,4 +20,4 @@ $ bin\Release\Letra.exe src/main.cpp
 ### Functionalities
 * `Esc` to leave
 * `Ctrl-S` to save
-* `Ctrl-P` to save as
+* `Ctrl-P` to open a file

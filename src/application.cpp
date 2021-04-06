@@ -79,14 +79,43 @@ void Application::handleInput(const MSG& msg)
         {
             if (m_command_prompt.getInput())
             {
-
                 bool done = m_command_prompt.handleInput(msg.wParam, m_cursor);
                 if (done)
                 {
-                    m_file.setFileName(m_command_prompt.getContent());
-                    m_command_prompt.setColor(0x3333ff);
-                    m_file.write(m_buffer.getContent());
-                    m_command_prompt.setString(L"File Saved!");
+                    m_cursor.setColor(0xfe8019);
+                    m_cursor.setPosition(0, 0);
+                    switch (m_command_prompt.getCmdType())
+                    {
+                        case CommandPrompt::OPEN_FILE:
+                        {
+                            m_command_prompt.setColor(0x3333ff);
+                            m_file.setFileName(m_command_prompt.getContent());
+                            if (m_file.exist())
+                            {
+                                m_buffer.setBuffer(m_file.read());
+                                m_text.setString(m_buffer.getContent());
+                            }
+                            else
+                            {
+                                m_command_prompt.setString(L"Couldn't open File!");
+                            }
+                        }
+                            break;
+                        case CommandPrompt::SAVE_FILE_AS:
+                        {
+                            m_file.setFileName(m_command_prompt.getContent());
+                            m_command_prompt.setColor(0x3333ff);
+                            m_file.write(m_buffer.getContent());
+                            m_command_prompt.setString(L"File Saved!");
+                        }
+                            break;
+                        case CommandPrompt::GOTO_LINE:
+                        {
+
+                        }
+                        break;
+                        default: break;
+                    }
                 }
                 break;
             }
@@ -105,7 +134,7 @@ void Application::handleInput(const MSG& msg)
                         m_cursor.setPosition(m_cursor.getRow() + 4, m_cursor.getCol());
                     }
                     break;
-                case 0x0D:
+                case 0x0D: // Enter key
                     {
                         std::wstring temp_str = m_buffer.getLine(m_cursor.getCol());
                         std::wstring new_str = L"";
@@ -119,12 +148,11 @@ void Application::handleInput(const MSG& msg)
                         m_cursor.setPosition(0, m_cursor.getCol() + 1);
                     }
                     break;
-                case 0x10:
+                case 0x10: // Ctrl-P
                 {
                     m_cursor.setPosition(0, 36.5724);
-                    m_command_prompt.setColor(0xff3333);
-                    m_command_prompt.setString(L"");
-                    m_command_prompt.setInput(true);
+                    m_cursor.setColor(0x151515);
+                    m_command_prompt.setInput(true, CommandPrompt::OPEN_FILE);
                 }
                     break;
                 case 0x1B:
@@ -135,9 +163,8 @@ void Application::handleInput(const MSG& msg)
                     if (m_file.getFilename().size() == 0)
                     {
                         m_cursor.setPosition(0, 36.5724);
-                        m_command_prompt.setColor(0xff3333);
-                        m_command_prompt.setString(L"");
-                        m_command_prompt.setInput(true);
+                        m_cursor.setColor(0x151515);
+                        m_command_prompt.setInput(true, CommandPrompt::SAVE_FILE_AS);
                         break;
                     }
                     m_file.write(m_buffer.getContent()); 

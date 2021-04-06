@@ -13,6 +13,8 @@ public:
 
     std::wstring getFilename() const;
 
+    bool exist() const;
+
     void setFileName(const std::wstring& filename);
 
     void write(const std::wstring& content);

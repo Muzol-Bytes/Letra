@@ -7,6 +7,7 @@ CommandPrompt::CommandPrompt(const float x, const float y, ID2D1HwndRenderTarget
     , m_body(10.0f, 10.0f)
     , m_buffer()
     , m_input(false)
+    , m_cmd_type(CommandPrompt::NONE)
 {
     DWRITE_HIT_TEST_METRICS htm = m_text.getCharacterMetricsAt(1, 1);
     m_body.setPosition(x, y);
@@ -21,14 +22,23 @@ std::wstring CommandPrompt::getContent()
     return temp_buffer;
 }
 
+CommandPrompt::Type CommandPrompt::getCmdType() const
+{
+    return m_cmd_type;
+}
+
 bool CommandPrompt::getInput() const
 {
     return m_input;
 }
 
-void CommandPrompt::setInput(const bool inpt)
+void CommandPrompt::setInput(const bool inpt, const CommandPrompt::Type cmd_type)
 {
-    m_input = inpt;
+    m_body.setColor(0xff3333);
+    m_buffer   = L"";
+    m_text.setString(m_buffer);
+    m_cmd_type = cmd_type;
+    m_input    = inpt;
 }
 
 void CommandPrompt::setColor(const uint32_t color)
@@ -56,13 +66,21 @@ bool CommandPrompt::handleInput(const wchar_t chr, Cursor& cursor)
             }
         }
         break;
-        case 0x1B:
-        case 0x0D:
+        case 0x0D: // enter
         {
             m_input = false;
 
             cursor.setPosition(0, 0);
             return true;
+        }
+        break;
+        case 0x1B:
+        {
+            m_buffer = L"";
+            m_text.setString(m_buffer);
+            m_input = false;
+            cursor.setColor(0xfe8019);
+            cursor.setPosition(0, 0);
         }
         break;
         default:

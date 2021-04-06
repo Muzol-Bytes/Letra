@@ -32,6 +32,13 @@ std::wstring File::getFilename() const
     return m_filename;
 }
 
+
+bool File::exist() const
+{
+    std::wifstream file(m_filename);
+    return file.is_open();
+}
+
 void File::setFileName(const std::wstring& filename)
 {
     m_filename = filename;
