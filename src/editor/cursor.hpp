@@ -26,7 +26,9 @@ public:
     
     float getCol() const;
 
-    void move(const Direction dir, Buffer& buffer);
+    void move(const float row_offset, const float col_offset);
+
+    void move(const WPARAM wParam, Buffer& buffer);
 
     void setPosition(const float row, const float col);
 

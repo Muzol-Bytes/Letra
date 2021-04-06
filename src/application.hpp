@@ -28,8 +28,8 @@ public:
     void onPaint();
 
 private:
-    Window   window;
-    Renderer render;
+    Window   m_window;
+    Renderer m_render;
     File     m_file;
     Buffer   m_buffer;
     Text     m_text;

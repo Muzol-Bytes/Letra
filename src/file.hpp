@@ -11,6 +11,10 @@ public:
     
     std::vector<std::wstring> read();
 
+    std::wstring getFilename() const;
+
+    void setFileName(const std::wstring& filename);
+
     void write(const std::wstring& content);
 
 private:

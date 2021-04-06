@@ -19,10 +19,23 @@ std::vector<std::wstring> File::read()
             content.emplace_back(line + L"\n");
         file.close();
     }
+    else
+    {
+        content.emplace_back(L" \n");
+    }
 
     return content;
 }
 
+std::wstring File::getFilename() const
+{
+    return m_filename;
+}
+
+void File::setFileName(const std::wstring& filename)
+{
+    m_filename = filename;
+}
 
 void File::write(const std::wstring& content)
 {

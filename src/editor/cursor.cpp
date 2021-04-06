@@ -11,6 +11,7 @@ Cursor::Cursor(const  DWRITE_HIT_TEST_METRICS htm)
    m_height = htm.height;
 
    m_body.setSize(m_width, m_height);
+   m_body.setColor(0xffffff);
 }
 
 Rect Cursor::getBody() const
@@ -28,24 +29,30 @@ float Cursor::getCol() const
     return m_col;
 }
 
-void Cursor::move(const Direction dir, Buffer& buffer)
+void Cursor::move(const float row_offset, const float col_offset)
 {
-    switch (dir)
+    m_row += row_offset;
+    m_col += col_offset;
+}
+
+void Cursor::move(const WPARAM wParam, Buffer& buffer)
+{
+    switch (wParam)
     {
-        case RIGHT:
+        case VK_RIGHT:
         {
             if (m_row + 1 > buffer.getLineLengthAt(m_col) - 1)
                 break;
             m_row += 1;
         }
         break;
-        case LEFT:
+        case VK_LEFT:
         {
             if (m_row > 0)
                 m_row -= 1;
         }
         break;
-        case UP:
+        case VK_UP:
         {
             if (m_col - 1 >= 0)
             {
@@ -67,7 +74,7 @@ void Cursor::move(const Direction dir, Buffer& buffer)
             }
         }
         break;
-        case DOWN:
+        case VK_DOWN:
         {
             if (m_col + 1 < buffer.getLineNum())
             {

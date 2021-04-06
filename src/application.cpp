@@ -8,20 +8,20 @@ const static uint16_t SCREEN_WIDTH  = 1080;
 const static uint16_t SCREEN_HEIGHT = 720;
 
 Application::Application(const std::vector<std::wstring> argv)
-    : window("Letra", SCREEN_WIDTH, SCREEN_HEIGHT)
-    , render(window.getWindowHandler())
+    : m_window("Letra", SCREEN_WIDTH, SCREEN_HEIGHT)
+    , m_render(m_window.getWindowHandler())
     , m_file(argv[0])
     , m_buffer(m_file.read())
-    , m_text(m_buffer.getContent(), render.render_target)
+    , m_text(m_buffer.getContent(), m_render.render_target)
     , m_cursor(m_text.getCharacterMetricsAt(1, 1))
-    , m_command_prompt(0.0f, 0.0f, render.render_target)
+    , m_command_prompt(0.0f, 0.0f, m_render.render_target)
     , p_brush(NULL)
 {
-    render.render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &p_brush);
+    m_render.render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &p_brush);
     m_command_prompt.setWidth(SCREEN_WIDTH);
     
     /// CommandPrompt config
-    D2D1_SIZE_F size = render.getSize();
+    D2D1_SIZE_F size = m_render.getSize();
     float char_size = m_text.getCharacterMetricsAt(1, 1).height;
     m_command_prompt.setPosition(0.0f, size.height - char_size);
     /// ---------------------------------------------------------
@@ -43,7 +43,7 @@ Application::~Application()
 
 void Application::run()
 {
-    window.show();
+    m_window.show();
 
     MSG msg = { 0 }; 
     while (GetMessage(&msg, NULL, 0, 0))
@@ -54,7 +54,7 @@ void Application::run()
         update();
 
         DispatchMessage(&msg);
-        InvalidateRect(window.getWindowHandler(), NULL, false);
+        InvalidateRect(m_window.getWindowHandler(), NULL, false);
     }
 }
 
@@ -64,50 +64,38 @@ void Application::update()
 
 void Application::handleInput(const MSG& msg)
 {
-    if (m_command_prompt.getInput())
-    {
-        m_command_prompt.handleInput(msg.wParam);
-    }
-
     /// NOTE: lParam and msg.wParam are inside the msg struct
     switch (msg.message)
     {
         case WM_KEYDOWN:
+        {
+            if (!m_command_prompt.getInput())
             {
-                switch(msg.wParam)
-                {
-                    case VK_LEFT:
-                        {
-                            m_cursor.move(Cursor::LEFT, m_buffer);
-                        }
-                        break;
-                    case VK_RIGHT:
-                        {
-                            m_cursor.move(Cursor::RIGHT, m_buffer);
-                        }
-                        break;
-                    case VK_DOWN:
-                        {
-                            m_cursor.move(Cursor::DOWN, m_buffer);
-                        }
-                        break;
-                    case VK_UP:
-                        {
-                            m_cursor.move(Cursor::UP, m_buffer);
-                        }
-                        break;
-                    default: break;
-                }
-            }
+                m_cursor.move(msg.wParam, m_buffer);
+            } 
+        }
             break;
         case WM_CHAR:
         {
+            if (m_command_prompt.getInput())
+            {
+
+                bool done = m_command_prompt.handleInput(msg.wParam, m_cursor);
+                if (done)
+                {
+                    m_file.setFileName(m_command_prompt.getContent());
+                    m_command_prompt.setColor(0x3333ff);
+                    m_file.write(m_buffer.getContent());
+                    m_command_prompt.setString(L"File Saved!");
+                }
+                break;
+            }
             switch ((wchar_t)msg.wParam)
             {
                 case 0x08: // Backspace
                     if (m_cursor.getRow() > 0)
                     {
-                        m_cursor.move(Cursor::LEFT, m_buffer);
+                        m_cursor.move(VK_LEFT, m_buffer);
                         m_buffer.deleteaAt(m_cursor.getCol(), m_cursor.getRow(), 1);
                     }
                     break;
@@ -131,12 +119,31 @@ void Application::handleInput(const MSG& msg)
                         m_cursor.setPosition(0, m_cursor.getCol() + 1);
                     }
                     break;
+                case 0x10:
+                {
+                    m_cursor.setPosition(0, 36.5724);
+                    m_command_prompt.setColor(0xff3333);
+                    m_command_prompt.setString(L"");
+                    m_command_prompt.setInput(true);
+                }
+                    break;
                 case 0x1B:
-                    window.destroy();
+                    m_window.destroy();
                 break;
                 case 0x13: // Ctrl-S
+                {
+                    if (m_file.getFilename().size() == 0)
+                    {
+                        m_cursor.setPosition(0, 36.5724);
+                        m_command_prompt.setColor(0xff3333);
+                        m_command_prompt.setString(L"");
+                        m_command_prompt.setInput(true);
+                        break;
+                    }
                     m_file.write(m_buffer.getContent()); 
                     m_command_prompt.setString(L"File Saved!");
+                }
+                    
                 break;
                 default:
                 {
@@ -171,15 +178,15 @@ void Application::onPaint()
 {
     HRESULT hr = S_OK;
     PAINTSTRUCT ps;
-    BeginPaint(window.getWindowHandler(), &ps);
-    render.render_target->BeginDraw();
+    BeginPaint(m_window.getWindowHandler(), &ps);
+    m_render.render_target->BeginDraw();
 
-    render.render_target->Clear(D2D1::ColorF(0x15 / 255.0f, 0x15 / 255.0f, 0x15 / 255.0f));
-    m_cursor.draw(render);
-    render.draw(&m_text);
-    m_command_prompt.draw(render);
+    m_render.render_target->Clear(D2D1::ColorF(0x15 / 255.0f, 0x15 / 255.0f, 0x15 / 255.0f));
+    m_command_prompt.draw(m_render);
+    m_cursor.draw(m_render);
+    m_render.draw(&m_text);
 
-    hr = render.render_target->EndDraw();
+    hr = m_render.render_target->EndDraw();
 
-    EndPaint(window.getWindowHandler(), &ps);
+    EndPaint(m_window.getWindowHandler(), &ps);
 }

@@ -6,7 +6,7 @@ CommandPrompt::CommandPrompt(const float x, const float y, ID2D1HwndRenderTarget
     : m_text(L"Prompt", render_target)
     , m_body(10.0f, 10.0f)
     , m_buffer()
-    , m_get_input(false)
+    , m_input(false)
 {
     DWRITE_HIT_TEST_METRICS htm = m_text.getCharacterMetricsAt(1, 1);
     m_body.setPosition(x, y);
@@ -16,12 +16,24 @@ CommandPrompt::CommandPrompt(const float x, const float y, ID2D1HwndRenderTarget
 
 std::wstring CommandPrompt::getContent()
 {
-    return m_buffer.str();
+    std::wstring temp_buffer = m_buffer;
+    m_buffer = L"";
+    return temp_buffer;
 }
 
 bool CommandPrompt::getInput() const
 {
-    return m_get_input;
+    return m_input;
+}
+
+void CommandPrompt::setInput(const bool inpt)
+{
+    m_input = inpt;
+}
+
+void CommandPrompt::setColor(const uint32_t color)
+{
+    m_body.setColor(color);
 }
 
 void CommandPrompt::setString(const std::wstring& str)
@@ -29,25 +41,40 @@ void CommandPrompt::setString(const std::wstring& str)
     m_text.setString(str);
 }
 
-void CommandPrompt::handleInput(const wchar_t chr)
+bool CommandPrompt::handleInput(const wchar_t chr, Cursor& cursor)
 {
-    if (m_get_input)
+    if (m_input)
     {
         switch (chr)
         {
+        case 0x08: // Backspace
+        {
+            if (cursor.getRow() > 0)
+            {
+                cursor.setPosition(cursor.getRow() - 1, cursor.getCol());
+                m_buffer.erase(cursor.getRow(), 1);
+            }
+        }
+        break;
+        case 0x1B:
         case 0x0D:
         {
-            m_get_input = false;
+            m_input = false;
+
+            cursor.setPosition(0, 0);
+            return true;
         }
-            break;
+        break;
         default:
         {
-            m_buffer << chr;
+            m_buffer += chr;
+            cursor.setPosition(cursor.getRow() + 1, cursor.getCol());
         }
-            break;
+        break;
         }
-        m_text.setString(getContent());
+        m_text.setString(m_buffer);
     }
+    return false;
 }
 
 void CommandPrompt::setPosition(const float x, const float y)

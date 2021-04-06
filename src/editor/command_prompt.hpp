@@ -3,12 +3,15 @@
 
 #include <d2d1.h>
 #include <string>
-#include <sstream>
 #include <cwchar>
 
+#include "cursor.hpp"
 #include "../graphics/renderer.hpp"
 #include "../graphics/text.hpp"
 #include "../graphics/rectangle.hpp"
+
+/// TODO: make a enum to diferenciate between different kinda of commands
+/// like OPEN_FILE, GOTO_LINE, SAVE_FILE_AS etc
 
 class CommandPrompt
 {
@@ -19,13 +22,19 @@ public:
 
     bool getInput() const;
 
+    bool getInputReady() const;
+
+    void setColor(const uint32_t color);
+
+    void setInput(const bool inpt);
+
     void setString(const std::wstring& str);
 
     void setPosition(const float x, const float y);
 
     void setWidth(const float width);
 
-    void handleInput(const wchar_t chr);
+    bool handleInput(const wchar_t chr, Cursor& cursor);
 
     void draw(Renderer& render);
 
@@ -33,8 +42,8 @@ private:
     Text m_text;
     Rect m_body;
 
-    std::wstringstream m_buffer;
-    bool m_get_input;
+    std::wstring m_buffer;
+    bool m_input;
 };
 
 #endif // _COMMAND_PROMPT_HPP_
