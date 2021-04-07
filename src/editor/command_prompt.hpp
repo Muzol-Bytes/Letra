@@ -10,9 +10,6 @@
 #include "../graphics/text.hpp"
 #include "../graphics/rectangle.hpp"
 
-/// TODO: make a enum to diferenciate between different kinda of commands
-/// like OPEN_FILE, GOTO_LINE, SAVE_FILE_AS etc
-
 class CommandPrompt
 {
 public:

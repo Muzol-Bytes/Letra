@@ -13,6 +13,9 @@ public:
     /// Get the entire content of the buffer as a std::wstring
     std::wstring getContent();
 
+    /// Get a range of lines as a std::wstring
+    std::wstring getLines(const size_t from, const size_t to);
+
     /// Get the line as a std::wstring
     std::wstring getLine(const size_t line_num);
 

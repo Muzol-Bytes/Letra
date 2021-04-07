@@ -22,6 +22,18 @@ std::wstring Buffer::getContent()
     return data;
 }
 
+std::wstring Buffer::getLines(const size_t from, const size_t to)
+{
+    std::wstring data;
+
+    for (size_t i = from; i < to; i++)
+    {
+        data += m_content[i];
+    }
+
+    return data;
+}
+
 std::wstring Buffer::getLine(const size_t line_num)
 {
     return m_content[line_num];

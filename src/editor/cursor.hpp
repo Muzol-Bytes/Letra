@@ -4,6 +4,7 @@
 #include <dwrite.h>
 
 #include "buffer.hpp"
+#include "editor.hpp"
 #include "../graphics/rectangle.hpp"
 #include "../graphics/renderer.hpp"
 
@@ -26,13 +27,15 @@ public:
     
     float getCol() const;
 
-    void setPosition(const float row, const float col);
-
     void setColor(const uint32_t color);
+
+    void setPosition(const float row, const float col, Editor& editor);
+
+    void setPosition(const float row, const float col);
 
     void move(const float row_offset, const float col_offset);
 
-    void move(const WPARAM wParam, Buffer& buffer);
+    void move(const WPARAM wParam, Buffer& buffer, Editor& editor);
 
 
     void draw(Renderer& render);
