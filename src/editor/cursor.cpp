@@ -59,6 +59,8 @@ void Cursor::move(const float row_offset, const float col_offset)
 
 void Cursor::move(const WPARAM wParam, Buffer& buffer, Editor& editor)
 {
+    float col = m_col + editor.col_offset;
+
     switch (wParam)
     {
         case VK_RIGHT:
@@ -68,7 +70,7 @@ void Cursor::move(const WPARAM wParam, Buffer& buffer, Editor& editor)
                 editor.row_offset += 1;
                 break;
             }
-            if (m_row + 1 > buffer.getLineLengthAt(m_col) - 1)
+            if (m_row + 1 > buffer.getLineLengthAt(col) - 1)
                 break;
             m_row += 1;
         }
@@ -94,15 +96,15 @@ void Cursor::move(const WPARAM wParam, Buffer& buffer, Editor& editor)
             }
             if (m_col - 1 >= 0)
             {
-                if (buffer.getLineLengthAt(m_col - 1) <= 1)
+                if (buffer.getLineLengthAt(col - 1) <= 1)
                 {
                     m_row = 0;
                     m_col -= 1;
                     break;
                 }
-                else if (m_row > buffer.getLineLengthAt(m_col - 1) - 1)
+                else if (m_row > buffer.getLineLengthAt(col - 1) - 1)
                 {
-                    m_row = buffer.getLineLengthAt(m_col - 1) - 1;
+                    m_row = buffer.getLineLengthAt(col - 1) - 1;
                     m_col -= 1;
                 }
                 else
@@ -114,7 +116,10 @@ void Cursor::move(const WPARAM wParam, Buffer& buffer, Editor& editor)
         break;
         case VK_DOWN:
         {
-            /// TODO: cursor goes down eternaly
+            /// Avoids that cursor go down eternily
+            if (col + 1 > buffer.getLineNum() - 1)
+                return;
+
             if (m_col + 1 > editor.max_col - 2)
             {
                 editor.col_offset += 1;
@@ -123,14 +128,14 @@ void Cursor::move(const WPARAM wParam, Buffer& buffer, Editor& editor)
 
             if (m_col + 1 < buffer.getLineNum())
             {
-                if (buffer.getLineLengthAt(m_col + 1) <= 1)
+                if (buffer.getLineLengthAt(col + 1) <= 1)
                 {
                     m_row = 0;
                     m_col += 1;
                 }
-                else if (m_row + 1 > buffer.getLineLengthAt(m_col + 1) - 1)
+                else if (m_row + 1 > buffer.getLineLengthAt(col + 1) - 1)
                 {
-                    m_row = buffer.getLineLengthAt(m_col + 1) - 1;
+                    m_row = buffer.getLineLengthAt(col + 1) - 1;
                     m_col += 1;
                 }
                 else

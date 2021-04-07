@@ -114,4 +114,3 @@ void CommandPrompt::draw(Renderer& render)
     render.draw(&m_body);
     render.draw(&m_text);
 }
-

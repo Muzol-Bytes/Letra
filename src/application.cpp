@@ -67,6 +67,9 @@ void Application::run()
 
 void Application::update()
 {
+    std::cout << "Cursor Pos: " << m_cursor.getCol() + m_editor.col_offset << '|'
+              << "max_rows: " << m_editor.max_col << '|'
+              << "col: "  << m_buffer.getLineNum() << '\r';
 }
 
 void Application::handleInput(const MSG& msg)
@@ -142,7 +145,7 @@ void Application::handleInput(const MSG& msg)
                     if (m_cursor.getRow() > 0)
                     {
                         m_cursor.move(VK_LEFT, m_buffer, m_editor);
-                        m_buffer.deleteaAt(m_cursor.getCol(), m_cursor.getRow(), 1);
+                        m_buffer.deleteaAt(m_cursor.getCol() + m_editor.col_offset, m_cursor.getRow(), 1);
                     }
                     break;
                 case 0x09: // Replace tab to space
