@@ -12,7 +12,7 @@ Application::Application(const std::vector<std::wstring> argv)
     , m_render(m_window.getWindowHandler())
     , m_file(argv[0])
     , m_buffer(m_file.read())
-    , m_text(m_buffer.getLines(0.0f, m_buffer.getLineNum()), m_render.render_target) 
+    , m_text(m_buffer, m_render.render_target) 
     , m_cursor(m_text.getCharacterMetricsAt(1, 1))
     , m_command_prompt(0.0f, 0.0f, m_render.render_target)
     , p_brush(NULL)
@@ -22,6 +22,7 @@ Application::Application(const std::vector<std::wstring> argv)
 
     /// Editor
     D2D1_SIZE_F size = m_render.getSize();
+
     DWRITE_HIT_TEST_METRICS char_size = m_text.getCharacterMetricsAt(1, 1);
     m_editor.row_offset = 0.0f;
     m_editor.col_offset = 0.0f;
@@ -67,9 +68,9 @@ void Application::run()
 
 void Application::update()
 {
-    std::cout << "Cursor Pos: " << m_cursor.getCol() + m_editor.col_offset << '|'
-              << "max_rows: " << m_editor.max_col << '|'
-              << "col: "  << m_buffer.getLineNum() << '\r';
+    /* std::cout << "Cursor Pos: " << m_cursor.getCol() + m_editor.col_offset << '|' */
+    /*           << "max_rows: " << m_editor.max_col << '|' */
+    /*           << "col: "  << m_buffer.getLineNum() << '\r'; */
 }
 
 void Application::handleInput(const MSG& msg)
@@ -83,16 +84,8 @@ void Application::handleInput(const MSG& msg)
             {
                 m_cursor.move(msg.wParam, m_buffer, m_editor);
             } 
-
-            if (m_editor.col_offset + (m_editor.max_col - 1) > m_buffer.getLineNum() - 1)
-            {
-                m_text.setString(m_buffer.getLines(m_editor.col_offset, m_buffer.getLineNum()));
-            }
-            else
-            {
-                m_text.setString(m_buffer.getLines(m_editor.col_offset,
-                                 m_editor.col_offset + (m_editor.max_col - 1)));
-            }
+            m_text.setString(m_buffer.getLines(m_editor.col_offset,
+                             m_editor.col_offset + (m_editor.max_col - 1)));
         }
             break;
         case WM_CHAR:
@@ -112,8 +105,10 @@ void Application::handleInput(const MSG& msg)
                             m_file.setFileName(m_command_prompt.getContent());
                             if (m_file.exist())
                             {
+                                m_editor.col_offset = 0;
                                 m_buffer.setBuffer(m_file.read());
-                                m_text.setString(m_buffer.getContent());
+                                m_text.setString(m_buffer.getLines(m_editor.col_offset,
+                                                 m_editor.col_offset + (m_editor.max_col - 1)));
                             }
                             else
                             {
@@ -131,7 +126,30 @@ void Application::handleInput(const MSG& msg)
                             break;
                         case CommandPrompt::GOTO_LINE:
                         {
+                            size_t line_num = std::stoi(m_command_prompt.getContent()); 
+                            if (line_num == 0) break;
+                            if (line_num > m_editor.max_col - 1)
+                            {
+                                if (line_num > m_buffer.getLineNum())
+                                {
+                                    m_editor.col_offset = m_buffer.getLineNum() - (int)(m_editor.max_col) + 1;
+                                }
+                                else
+                                {
+                                    m_editor.col_offset = line_num - (int)(m_editor.max_col) + 1;
+                                }
 
+                                m_cursor.setPosition(0, (int)(m_editor.max_col) - 2);
+                                m_text.setString(m_buffer.getLines(m_editor.col_offset,
+                                                 m_editor.col_offset + (m_editor.max_col - 1)));
+                            }
+                            else
+                            {
+                                m_editor.col_offset = 0;
+                                m_cursor.setPosition(0, line_num - 1);
+                                m_text.setString(m_buffer.getLines(m_editor.col_offset,
+                                                 m_editor.col_offset + (m_editor.max_col - 1)));
+                            }
                         }
                         break;
                         default: break;
@@ -181,6 +199,13 @@ void Application::handleInput(const MSG& msg)
                     m_command_prompt.setInput(true, CommandPrompt::OPEN_FILE);
                 }
                     break;
+                case 0x07: // Ctrl-G
+                {
+                    m_cursor.setPosition(0, m_editor.max_col - 1, m_editor);
+                    m_cursor.setColor(0x151515);
+                    m_command_prompt.setInput(true, CommandPrompt::GOTO_LINE);
+                }
+                    break;
                 case 0x1B:
                     m_window.destroy();
                 break;
@@ -218,15 +243,8 @@ void Application::handleInput(const MSG& msg)
                     /* printf("%d\n", (int)msg.wParam); */
                 break;
             }
-            if (m_editor.col_offset + (m_editor.max_col - 1) > m_buffer.getLineNum())
-            {
-                m_text.setString(m_buffer.getLines(m_editor.col_offset, m_buffer.getLineNum()));
-            }
-            else
-            {
                 m_text.setString(m_buffer.getLines(m_editor.col_offset,
                                  m_editor.col_offset + (m_editor.max_col - 1)));
-            }
         }
             break;
 

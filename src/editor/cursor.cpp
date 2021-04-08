@@ -5,10 +5,12 @@
 Cursor::Cursor(const  DWRITE_HIT_TEST_METRICS htm)
     : m_body(10.0f, 10.0f)
 {
-   m_row    = 0.0f;
-   m_col    = 0.0f;
-   m_width  = htm.width;
-   m_height = htm.height;
+   m_row        = 0.0f;
+   m_col        = 0.0f;
+   m_row_offset = 0.0f;
+   m_col_offset = 0.0f;
+   m_width      = htm.width;
+   m_height     = htm.height;
 
    m_body.setSize(m_width, m_height);
    m_body.setColor(0xfe8019);
@@ -27,6 +29,16 @@ float Cursor::getRow() const
 float Cursor::getCol() const
 {
     return m_col;
+}
+
+float Cursor::getRowOffset() const
+{
+    return m_row_offset;
+}
+
+float Cursor::getColOffset() const
+{
+    return m_col_offset;
 }
 
 void Cursor::setColor(const uint32_t color)

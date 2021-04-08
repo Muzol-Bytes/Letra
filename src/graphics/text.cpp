@@ -17,7 +17,7 @@ Text::Text()
     m_screen_size    = { 0 };
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
-    m_text           = L"";
+    m_text           = L" ";
     m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
 }
@@ -32,6 +32,22 @@ Text::Text(std::wstring text, ID2D1HwndRenderTarget *render_target)
     m_color          = 0xffffff;
 
     createDeviceIndependentResources(render_target);
+}
+
+Text::Text(Buffer buffer, ID2D1HwndRenderTarget *render_target)
+{
+    m_screen_size    = { 0 };
+    p_Dwrite_factory = NULL;
+    p_Dtext_format   = NULL;
+    m_text           = L" ";
+    m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
+    m_color          = 0xffffff;
+
+    createDeviceIndependentResources(render_target);
+
+    float char_height     = getCharacterMetricsAt(1).height; 
+    float max_screen_col  = m_screen_size.bottom / char_height;
+    setString(buffer.getLines(0.0f, max_screen_col - 1));
 }
 
 Text::~Text()

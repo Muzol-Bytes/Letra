@@ -27,6 +27,10 @@ public:
     
     float getCol() const;
 
+    float getRowOffset() const;
+    
+    float getColOffset() const;
+
     void setColor(const uint32_t color);
 
     void setPosition(const float row, const float col, Editor& editor);
@@ -45,6 +49,8 @@ private:
 
     float m_row;
     float m_col;
+    float m_row_offset;
+    float m_col_offset;
     float m_width;
     float m_height;
 };

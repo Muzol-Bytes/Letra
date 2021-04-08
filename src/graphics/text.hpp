@@ -9,6 +9,7 @@
 #include <cstdint>
 
 #include "drawable.hpp"
+#include "../editor/buffer.hpp"
 
 class Text : public IDrawable
 {
@@ -16,6 +17,8 @@ public:
     Text();
 
     Text(std::wstring text, ID2D1HwndRenderTarget *render_target);
+
+    Text(Buffer buffer, ID2D1HwndRenderTarget *render_target);
 
     ~Text();
 
