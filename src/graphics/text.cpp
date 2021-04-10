@@ -20,6 +20,7 @@ Text::Text()
     m_text           = L" ";
     m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
+    m_update         = false;
 }
 
 Text::Text(std::wstring text, ID2D1HwndRenderTarget *render_target)
@@ -30,6 +31,7 @@ Text::Text(std::wstring text, ID2D1HwndRenderTarget *render_target)
     m_text           = text;
     m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
+    m_update         = false;
 
     createDeviceIndependentResources(render_target);
 }
@@ -42,6 +44,7 @@ Text::Text(Buffer buffer, ID2D1HwndRenderTarget *render_target)
     m_text           = L" ";
     m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
+    m_update         = false;
 
     createDeviceIndependentResources(render_target);
 
@@ -114,14 +117,6 @@ DWRITE_HIT_TEST_METRICS Text::getCharacterMetricsAt(UINT32 char_pos)
             &y,
             &htm);
 
-#if 0
-    printf("x = %f; y = %f\n", x, y);
-    printf("left %f\n", htm.left);
-    printf("right %f\n", htm.left+htm.width);
-    printf("top %f\n", htm.top);
-    printf("bottom %f\n", htm.top + htm.height);
-#endif
-
     return htm;
 }
 
@@ -142,10 +137,21 @@ DWRITE_HIT_TEST_METRICS Text::getCharacterMetricsAt(const float x, const float y
     return htm;
 }
 
+void Text::updateText()
+{
+    m_update = true;
+}
+
+bool Text::update()
+{
+    return m_update;
+}
+
 void Text::setPosition(const float x, const float y)
 {
     m_pos = (D2D1_POINT_2F){ x, y };
 }
+
 
 D2D1_POINT_2F Text::getPosition() const
 {
@@ -176,6 +182,8 @@ void Text::setString(const std::wstring& str)
 
 void Text::draw(ID2D1HwndRenderTarget *render_target, ID2D1SolidColorBrush *brush)
 {
+    m_update = false;
+
     brush->SetColor(D2D1::ColorF(
                 (m_color >> 16 & 0xff) / 255.0f,
                 (m_color >> 8  & 0xff) / 255.0f,

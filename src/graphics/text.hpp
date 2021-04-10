@@ -31,9 +31,16 @@ public:
     /// Get a character metrics at x and y device independent pixels 
     DWRITE_HIT_TEST_METRICS getCharacterMetricsAt(const float x, const float y);
 
-    void setPosition(const float x, const float y);
-
     D2D1_POINT_2F getPosition() const;
+
+    /// Sets a internal boolean for update text data when it's called
+    void updateText(); 
+
+    /// Returns the value of m_update
+    bool update(); 
+
+    /// Set a position of the text box
+    void setPosition(const float x, const float y);
 
     /// NOTE: Only call this function after you call "createDeviceIndependentResources"
     void setString(const std::wstring& str);
@@ -49,6 +56,7 @@ private:
 
     std::wstring m_text;
     D2D1_POINT_2F m_pos;
+    bool m_update;
 };
 
 #endif // _TEXT_HPP_

@@ -68,9 +68,12 @@ void Application::run()
 
 void Application::update()
 {
-    /* std::cout << "Cursor Pos: " << m_cursor.getCol() + m_editor.col_offset << '|' */
-    /*           << "max_rows: " << m_editor.max_col << '|' */
-    /*           << "col: "  << m_buffer.getLineNum() << '\r'; */
+    if (m_text.update())
+    {
+        std::cout << "update\n";
+        m_text.setString(m_buffer.getLines(m_editor.col_offset,
+                         m_editor.col_offset + (m_editor.max_col - 1)));
+    }
 }
 
 void Application::handleInput(const MSG& msg)
@@ -84,8 +87,13 @@ void Application::handleInput(const MSG& msg)
             {
                 m_cursor.move(msg.wParam, m_buffer, m_editor);
             } 
-            m_text.setString(m_buffer.getLines(m_editor.col_offset,
-                             m_editor.col_offset + (m_editor.max_col - 1)));
+
+            /// if scrolling down or up update the text
+            if (m_cursor.getCol() + 1 > m_editor.max_col - 2 ||
+               (m_cursor.getCol() - 1 < 0 && m_editor.col_offset - 1 > 0))
+            {
+                m_text.updateText();
+            }
         }
             break;
         case WM_CHAR:
@@ -107,8 +115,7 @@ void Application::handleInput(const MSG& msg)
                             {
                                 m_editor.col_offset = 0;
                                 m_buffer.setBuffer(m_file.read());
-                                m_text.setString(m_buffer.getLines(m_editor.col_offset,
-                                                 m_editor.col_offset + (m_editor.max_col - 1)));
+                                m_text.updateText();
                             }
                             else
                             {
@@ -128,6 +135,12 @@ void Application::handleInput(const MSG& msg)
                         {
                             size_t line_num = std::stoi(m_command_prompt.getContent()); 
                             if (line_num == 0) break;
+                            if (line_num > m_buffer.getLineNum() &&
+                                m_buffer.getLineNum() < m_editor.max_col)
+                            {
+                                m_cursor.setPosition(0, m_buffer.getLineNum() - 1);
+                                break;
+                            }
                             if (line_num > m_editor.max_col - 1)
                             {
                                 if (line_num > m_buffer.getLineNum())
@@ -140,16 +153,16 @@ void Application::handleInput(const MSG& msg)
                                 }
 
                                 m_cursor.setPosition(0, (int)(m_editor.max_col) - 2);
-                                m_text.setString(m_buffer.getLines(m_editor.col_offset,
-                                                 m_editor.col_offset + (m_editor.max_col - 1)));
                             }
                             else
                             {
+                                if (line_num > m_buffer.getLineNum())
+                                    line_num = m_buffer.getLineNum();
+
                                 m_editor.col_offset = 0;
                                 m_cursor.setPosition(0, line_num - 1);
-                                m_text.setString(m_buffer.getLines(m_editor.col_offset,
-                                                 m_editor.col_offset + (m_editor.max_col - 1)));
                             }
+                            m_text.updateText();
                         }
                         break;
                         default: break;
@@ -243,8 +256,8 @@ void Application::handleInput(const MSG& msg)
                     /* printf("%d\n", (int)msg.wParam); */
                 break;
             }
-                m_text.setString(m_buffer.getLines(m_editor.col_offset,
-                                 m_editor.col_offset + (m_editor.max_col - 1)));
+
+            m_text.updateText();
         }
             break;
 
