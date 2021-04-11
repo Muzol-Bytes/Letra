@@ -19,6 +19,10 @@ public:
     /// Get the line as a std::wstring
     std::wstring getLine(const size_t line_num);
 
+
+    /// Get the digits count of the maximum column of the buffer
+    size_t getLineNumPadding() const;
+
     /// Get the number of lines the buffer has
     size_t getLineNum();
 
@@ -38,6 +42,7 @@ public:
     void deleteaAt(const size_t line_num, const size_t pos, const size_t count);
 
 private:
+    size_t m_line_num_padding;
     std::vector<std::wstring> m_content;
 };
 

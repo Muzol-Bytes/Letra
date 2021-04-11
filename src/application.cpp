@@ -70,7 +70,7 @@ void Application::update()
 {
     if (m_text.update())
     {
-        std::cout << "update\n";
+        // std::cout << "update\n";
         m_text.setString(m_buffer.getLines(m_editor.col_offset,
                          m_editor.col_offset + (m_editor.max_col - 1)));
     }
@@ -89,8 +89,7 @@ void Application::handleInput(const MSG& msg)
             } 
 
             /// if scrolling down or up update the text
-            if (m_cursor.getCol() + 1 > m_editor.max_col - 2 ||
-               (m_cursor.getCol() - 1 < 0 && m_editor.col_offset - 1 > 0))
+            if (m_cursor.getCol() + 1 > m_editor.max_col - 2 || m_cursor.getCol() - 1 < 0)
             {
                 m_text.updateText();
             }
