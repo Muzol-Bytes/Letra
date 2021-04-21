@@ -23,7 +23,7 @@ public:
     ~Text();
 
     /// Initialize the text core resources and create a renderable text object
-    HRESULT createDeviceIndependentResources(ID2D1HwndRenderTarget *render_target);
+    HRESULT createDeviceIndependentResources(ID2D1HwndRenderTarget *render_target, std::wstring text);
 
     /// Get a character metrics at a certain position (use it like get a value from an array)
     DWRITE_HIT_TEST_METRICS getCharacterMetricsAt(UINT32 char_pos);
@@ -54,7 +54,6 @@ private:
     IDWriteTextLayout *p_Dtext_layout;
     RECT m_screen_size;
 
-    std::wstring m_text;
     D2D1_POINT_2F m_pos;
     bool m_update;
 };

@@ -53,16 +53,18 @@ void CommandPrompt::setString(const std::wstring& str)
 
 bool CommandPrompt::handleInput(const wchar_t chr, Cursor& cursor)
 {
+    size_t row = cursor.getRow() - cursor.getRowPadding();
+
     if (m_input)
     {
         switch (chr)
         {
         case 0x08: // Backspace
         {
-            if (cursor.getRow() > 0)
+            if (row > 0)
             {
-                cursor.setPosition(cursor.getRow() - 1, cursor.getCol());
-                m_buffer.erase(cursor.getRow(), 1);
+                cursor.setPosition(row - 1, cursor.getCol());
+                m_buffer.erase(row, 1);
             }
         }
         break;
@@ -71,6 +73,7 @@ bool CommandPrompt::handleInput(const wchar_t chr, Cursor& cursor)
             m_input = false;
 
             cursor.setPosition(0, 0);
+            setColor(0x3333ff);
             return true;
         }
         break;
@@ -81,12 +84,13 @@ bool CommandPrompt::handleInput(const wchar_t chr, Cursor& cursor)
             m_input = false;
             cursor.setColor(0xfe8019);
             cursor.setPosition(0, 0);
+            setColor(0x3333ff);
         }
         break;
         default:
         {
             m_buffer += chr;
-            cursor.setPosition(cursor.getRow() + 1, cursor.getCol());
+            cursor.setPosition(row + 1, cursor.getCol());
         }
         break;
         }

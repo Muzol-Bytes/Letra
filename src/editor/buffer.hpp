@@ -1,6 +1,8 @@
 #ifndef _BUFFER_HPP_
 #define _BUFFER_HPP_
 
+#include <windows.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -19,15 +21,17 @@ public:
     /// Get the line as a std::wstring
     std::wstring getLine(const size_t line_num);
 
-
     /// Get the digits count of the maximum column of the buffer
-    size_t getLineNumPadding() const;
+    size_t& getRowPadding();
 
     /// Get the number of lines the buffer has
     size_t getLineNum();
 
     /// Get the length of a line of the given position
     size_t getLineLengthAt(const size_t line_num);
+
+    /// Handle the key input for the buffer
+    void handleCharInput(const WPARAM wParam, const uint32_t row, const uint32_t col);
 
     /// Set the content of the buffer to the given one
     void setBuffer(const std::vector<std::wstring> file_content);
@@ -42,7 +46,7 @@ public:
     void deleteaAt(const size_t line_num, const size_t pos, const size_t count);
 
 private:
-    size_t m_line_num_padding;
+    size_t m_row_padding;
     std::vector<std::wstring> m_content;
 };
 

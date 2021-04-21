@@ -2,7 +2,7 @@
 
 #include "log/log.hpp"
 
-#include <iostream>
+#include <cstdio>
 
 const static uint16_t SCREEN_WIDTH  = 1080;
 const static uint16_t SCREEN_HEIGHT = 720;
@@ -20,14 +20,20 @@ Application::Application(const std::vector<std::wstring> argv)
     m_render.render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &p_brush);
     m_command_prompt.setWidth(SCREEN_WIDTH);
 
+    /// Cursor
+    m_cursor.setRowPadding(m_buffer.getRowPadding());
+
     /// Editor
     D2D1_SIZE_F size = m_render.getSize();
 
     DWRITE_HIT_TEST_METRICS char_size = m_text.getCharacterMetricsAt(1, 1);
-    m_editor.row_offset = 0.0f;
-    m_editor.col_offset = 0.0f;
-    m_editor.max_row    = size.width / char_size.width;
-    m_editor.max_col    = size.height / char_size.height;
+    m_editor.row_padding = &m_buffer.getRowPadding(); 
+    m_editor.row_offset  = 0.0f;
+    m_editor.col_offset  = 0.0f;
+    m_editor.max_row     = size.width / char_size.width;
+    m_editor.max_col     = size.height / char_size.height;
+    m_editor.is_file_modified = false;
+    m_editor.is_file_new = (m_file.getFilename().size() == 0);
     ///
     
     /// CommandPrompt config
@@ -70,9 +76,8 @@ void Application::update()
 {
     if (m_text.update())
     {
-        // std::cout << "update\n";
-        m_text.setString(m_buffer.getLines(m_editor.col_offset,
-                         m_editor.col_offset + (m_editor.max_col - 1)));
+        m_text.setString(m_buffer.getLines(m_cursor.getColOffset(),
+                         m_cursor.getColOffset() + (m_editor.max_col - 1)));
     }
 }
 
@@ -85,7 +90,7 @@ void Application::handleInput(const MSG& msg)
         {
             if (!m_command_prompt.getInput())
             {
-                m_cursor.move(msg.wParam, m_buffer, m_editor);
+                m_cursor.handleKeyInput(msg.wParam, m_buffer, m_editor);
             } 
 
             /// if scrolling down or up update the text
@@ -108,11 +113,10 @@ void Application::handleInput(const MSG& msg)
                     {
                         case CommandPrompt::OPEN_FILE:
                         {
-                            m_command_prompt.setColor(0x3333ff);
                             m_file.setFileName(m_command_prompt.getContent());
                             if (m_file.exist())
                             {
-                                m_editor.col_offset = 0;
+                                m_cursor.setColOffset(0);
                                 m_buffer.setBuffer(m_file.read());
                                 m_text.updateText();
                             }
@@ -125,7 +129,6 @@ void Application::handleInput(const MSG& msg)
                         case CommandPrompt::SAVE_FILE_AS:
                         {
                             m_file.setFileName(m_command_prompt.getContent());
-                            m_command_prompt.setColor(0x3333ff);
                             m_file.write(m_buffer.getContent());
                             m_command_prompt.setString(L"File Saved!");
                         }
@@ -144,11 +147,11 @@ void Application::handleInput(const MSG& msg)
                             {
                                 if (line_num > m_buffer.getLineNum())
                                 {
-                                    m_editor.col_offset = m_buffer.getLineNum() - (int)(m_editor.max_col) + 1;
+                                    m_cursor.setColOffset(m_buffer.getLineNum() - (int)(m_editor.max_col) + 1);
                                 }
                                 else
                                 {
-                                    m_editor.col_offset = line_num - (int)(m_editor.max_col) + 1;
+                                    m_cursor.setColOffset(line_num - (int)(m_editor.max_col) + 1);
                                 }
 
                                 m_cursor.setPosition(0, (int)(m_editor.max_col) - 2);
@@ -158,7 +161,7 @@ void Application::handleInput(const MSG& msg)
                                 if (line_num > m_buffer.getLineNum())
                                     line_num = m_buffer.getLineNum();
 
-                                m_editor.col_offset = 0;
+                                m_cursor.setColOffset(0);
                                 m_cursor.setPosition(0, line_num - 1);
                             }
                             m_text.updateText();
@@ -171,50 +174,13 @@ void Application::handleInput(const MSG& msg)
             }
             switch ((wchar_t)msg.wParam)
             {
-                case 0x08: // Backspace
-                    if (m_cursor.getRow() > 0)
-                    {
-                        m_cursor.move(VK_LEFT, m_buffer, m_editor);
-                        m_buffer.deleteaAt(m_cursor.getCol() + m_editor.col_offset, m_cursor.getRow(), 1);
-                    }
-                    break;
-                case 0x09: // Replace tab to space
-                    {
-                        m_buffer.insertAt(m_cursor.getCol() + m_editor.col_offset, m_cursor.getRow() + m_editor.col_offset, 4, L' ');
-                        m_cursor.setPosition(m_cursor.getRow() + 4, m_cursor.getCol(), m_editor);
-                    }
-                    break;
-                case 0x0D: // Enter key
-                    {
-                        std::wstring temp_str = m_buffer.getLine(m_cursor.getCol() + m_editor.col_offset);
-                        std::wstring new_str = L"";
-
-                        for (size_t i = m_cursor.getRow(); i < temp_str.size(); i++)
-                        {
-                            new_str += temp_str[i];
-                        }
-                        m_buffer.deleteaAt(m_cursor.getCol() + m_editor.col_offset,
-                                           m_cursor.getRow(), new_str.size() - 1);
-                        m_buffer.append(new_str, m_cursor.getCol() + 1 + m_editor.col_offset);
-                        if (m_cursor.getCol() > m_editor.max_col - 3)
-                        {
-                            m_editor.col_offset += 1;
-                            break;
-                        }
-                        m_cursor.setPosition(0, m_cursor.getCol() + 1, m_editor);
-                    }
-                    break;
                 case 0x10: // Ctrl-P
                 {
-                    m_cursor.setPosition(0, m_editor.max_col - 1, m_editor);
-                    m_cursor.setColor(0x151515);
                     m_command_prompt.setInput(true, CommandPrompt::OPEN_FILE);
                 }
                     break;
                 case 0x07: // Ctrl-G
                 {
-                    m_cursor.setPosition(0, m_editor.max_col - 1, m_editor);
-                    m_cursor.setColor(0x151515);
                     m_command_prompt.setInput(true, CommandPrompt::GOTO_LINE);
                 }
                     break;
@@ -225,8 +191,6 @@ void Application::handleInput(const MSG& msg)
                 {
                     if (m_file.getFilename().size() == 0)
                     {
-                        m_cursor.setPosition(0, m_editor.max_col, m_editor);
-                        m_cursor.setColor(0x151515);
                         m_command_prompt.setInput(true, CommandPrompt::SAVE_FILE_AS);
                         break;
                     }
@@ -237,25 +201,13 @@ void Application::handleInput(const MSG& msg)
                 break;
                 default:
                 {
-                    m_cursor.setPosition(m_cursor.getRow() + 1, m_cursor.getCol(), m_editor);
-
-                    if (m_cursor.getRow() == 0)
-                    {
-                        m_buffer.insertAt(m_cursor.getCol() + m_editor.col_offset,
-                                          m_cursor.getRow(), 1,
-                                          (wchar_t)msg.wParam);
-                    }
-                    else
-                    {
-                        m_buffer.insertAt(m_cursor.getCol() + m_editor.col_offset,
-                                         (m_cursor.getRow() - 1), 1,
-                                         (wchar_t)msg.wParam);
-                    }
-                }
                     /* printf("%d\n", (int)msg.wParam); */
+                }
                 break;
             }
 
+            m_buffer.handleCharInput(msg.wParam, (uint32_t)m_cursor.getRow(), (uint32_t)m_cursor.getCol());
+            m_cursor.handleCharInput(msg.wParam, m_buffer, m_editor);
             m_text.updateText();
         }
             break;

@@ -31,6 +31,14 @@ public:
     
     float getColOffset() const;
 
+    size_t getRowPadding() const;
+
+    void setRowOffset(const float row_offset);
+
+    void setColOffset(const float col_offset);
+
+    void setRowPadding(size_t& row_padding);
+
     void setColor(const uint32_t color);
 
     void setPosition(const float row, const float col, Editor& editor);
@@ -39,8 +47,9 @@ public:
 
     void move(const float row_offset, const float col_offset);
 
-    void move(const WPARAM wParam, Buffer& buffer, Editor& editor);
+    void handleCharInput(const WPARAM wParam, Buffer& buffer, Editor& editor);
 
+    void handleKeyInput(const WPARAM wParam, Buffer& buffer, Editor& editor);
 
     void draw(Renderer& render);
 
@@ -53,6 +62,7 @@ private:
     float m_col_offset;
     float m_width;
     float m_height;
+    size_t *p_row_padding;
 };
 
 #endif // _CURSOR_HPP_

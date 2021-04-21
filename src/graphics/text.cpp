@@ -17,7 +17,6 @@ Text::Text()
     m_screen_size    = { 0 };
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
-    m_text           = L" ";
     m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
     m_update         = false;
@@ -28,12 +27,11 @@ Text::Text(std::wstring text, ID2D1HwndRenderTarget *render_target)
     m_screen_size    = { 0 };
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
-    m_text           = text;
     m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
     m_update         = false;
 
-    createDeviceIndependentResources(render_target);
+    createDeviceIndependentResources(render_target, text);
 }
 
 Text::Text(Buffer buffer, ID2D1HwndRenderTarget *render_target)
@@ -41,12 +39,11 @@ Text::Text(Buffer buffer, ID2D1HwndRenderTarget *render_target)
     m_screen_size    = { 0 };
     p_Dwrite_factory = NULL;
     p_Dtext_format   = NULL;
-    m_text           = L" ";
     m_pos            = (D2D1_POINT_2F){0.0f, 0.0f};
     m_color          = 0xffffff;
     m_update         = false;
 
-    createDeviceIndependentResources(render_target);
+    createDeviceIndependentResources(render_target, L"");
 
     float char_height     = getCharacterMetricsAt(1).height; 
     float max_screen_col  = m_screen_size.bottom / char_height;
@@ -60,7 +57,7 @@ Text::~Text()
     SafeRelease(&p_Dtext_layout);
 }
 
-HRESULT Text::createDeviceIndependentResources(ID2D1HwndRenderTarget *render_target)
+HRESULT Text::createDeviceIndependentResources(ID2D1HwndRenderTarget *render_target, std::wstring text)
 {
     HRESULT hr = S_OK;
 
@@ -94,8 +91,8 @@ HRESULT Text::createDeviceIndependentResources(ID2D1HwndRenderTarget *render_tar
         GetClientRect(hwnd, &m_screen_size);
 
         hr = p_Dwrite_factory->CreateTextLayout(
-            m_text.c_str(),
-            m_text.size(),
+            text.c_str(),
+            text.size(),
             p_Dtext_format,
             m_screen_size.right,
             m_screen_size.bottom,
@@ -176,7 +173,6 @@ void Text::setString(const std::wstring& str)
     {
         SafeRelease(&p_Dtext_layout);
         p_Dtext_layout = temp_layout;
-        m_text = str;
     }
 }
 

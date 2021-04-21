@@ -3,13 +3,13 @@
 Buffer::Buffer()
     : m_content()
 {
-    m_line_num_padding = std::to_string(getLineNum()).size();
+    m_row_padding = std::to_string(getLineNum()).size() + 1;
 }
 
 Buffer::Buffer(const std::vector<std::wstring> content)
     : m_content(content)
 {
-    m_line_num_padding = std::to_string(getLineNum()).size();
+    m_row_padding = std::to_string(getLineNum()).size() + 1;
 }
 
 std::wstring Buffer::getContent()
@@ -29,7 +29,7 @@ std::wstring Buffer::getLines(const size_t from, size_t to)
     if (to > m_content.size())
         to = m_content.size();
 
-    m_line_num_padding = std::to_string(getLineNum()).size();
+    m_row_padding = std::to_string(getLineNum()).size() + 1;
     std::wstring data;
     size_t space_padding = 0;
 
@@ -53,9 +53,9 @@ std::wstring Buffer::getLine(const size_t line_num)
     return m_content[line_num];
 }
 
-size_t Buffer::getLineNumPadding() const
+size_t& Buffer::getRowPadding()
 {
-    return m_line_num_padding;
+    return m_row_padding;
 }
 
 size_t Buffer::getLineNum()
@@ -66,6 +66,43 @@ size_t Buffer::getLineNum()
 size_t Buffer::getLineLengthAt(const size_t line_num)
 {
     return m_content[line_num].size();
+}
+
+void Buffer::handleCharInput(const WPARAM wParam, const uint32_t row, const uint32_t col)
+{
+    switch (wParam)
+    {
+        case 0x08: // Backspace
+        if (row > 0)
+        {
+            deleteaAt(col, row - 1, 1);
+        }
+        break;
+        case 0x09: // Replace tab to space
+        { 
+            insertAt(col, row, 4, L' ');
+        }
+        break;
+        case 0x0D: // Enter key
+        {
+            std::wstring temp_str = getLine(col);
+            std::wstring new_str = L"";
+
+            for (size_t i = row; i < temp_str.size(); i++)
+            {
+                new_str += temp_str[i];
+            }
+            deleteaAt(col, row, new_str.size() - 1);
+            append(new_str, col + 1);
+        }
+        break;
+        default:
+        {
+            insertAt(col, row, 1, wParam);
+        }
+        break;
+    }
+
 }
 
 void Buffer::setBuffer(const std::vector<std::wstring> file_content)
